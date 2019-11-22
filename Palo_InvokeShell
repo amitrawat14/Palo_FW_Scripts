@@ -1,0 +1,43 @@
+import paramiko,time
+client = paramiko.SSHClient()
+client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+
+
+## This program invoke shell which doesn't required login for every session. One session are generally enough to send multiple command with time paus required
+## invoke shell give terminal to run multiple commands but issue is we get echo of our own commands, but good to run multiple commands
+## Other way to run is to use client.exec_command which can run only one command and session is closed but this helps avoiding echo
+## Check the other programs
+
+
+
+# client = paramiko.SSHClient()
+# # client.set_missing_host_key_policy(AllowAnythingPolicy())
+def login(client):
+    client.connect('fw_hostname', username='a-amit',password = '')
+    transport = client.get_transport()
+    return transport
+
+
+def execute_command (transport,command,timesleep=1):
+    session = transport.open_session()
+    session.get_pty()
+    session.invoke_shell()
+    output = session.recv(199)
+    print (output.decode())
+    session.send((command +"\n").encode())
+    time.sleep(10)
+    output = session.recv(49999)
+    print (f"printing output for command ***{command}***")
+    output = output.decode()
+    print(output)
+
+    print ("\n************************************************")
+
+
+commands = ['show system info','show system resources']
+
+transport=login(client)
+for command in commands:
+    execute_command(transport,command=command,timesleep=5)
+
