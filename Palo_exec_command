@@ -1,0 +1,48 @@
+import paramiko,time
+client = paramiko.SSHClient()
+
+
+#client.keep_this = client
+
+## This program use paramiko exec_command method where one command can be run only and session is closed. 
+## Everycommand required another session which is shown here 
+
+# client = paramiko.SSHClient()
+# client.set_missing_host_key_policy(AllowAnythingPolicy())
+
+def login(client):
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect('mkt-ams5-fw2a', username='a-amitsingh.rawat',password = 'Meinhukaun1@')
+    transport = client.get_transport()
+    return transport
+
+#transport = login(client)
+
+def execute_command (client,command):
+    client.connect('fw-hostname', username='amitrawat',password = 'secretpassword!23324f43434')
+    print("connected")
+    stdin,stdout,stderr = client.exec_command(' ')
+    stdin.channel.send(command)
+    stdin.channel.shutdown_write()
+    #resp = stdout.read().decode('utf_8').split('\n')
+    resp = stdout.read().decode('utf_8')
+    print (f"printing output for command ****************************************{command}***")
+    print(resp)
+    print ("\n************************************************")
+
+
+commands = ['show system info','show system resources']
+
+for command in commands:
+    #execute_command(client=login(client1),command=command)
+    execute_command(client,command=command)
+
+# command1 = "show clock"
+# command2 = "show users"
+
+
+# execute_command(login=login(client),command=command1)
+# execute_command(login=login(client),command=command2)
+
+client.close()
+
